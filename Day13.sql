@@ -8,6 +8,22 @@
   WHERE duplicate_companies >1 
 
  --baitap 2 
+  WITH CTE1 AS (SELECT Category, product, spend as total_spend
+FROM product_spend 
+WHERE category = 'appliance'
+ORDER BY spend DESC
+LIMIT 2 ),
+
+CTE2 AS(SELECT Category, product, spend as total_spend
+FROM product_spend 
+WHERE category = 'electronics'
+ORDER BY spend DESC
+LIMIT 2 )
+
+SELECT Category, product,  total_spend FROM CTE1
+UNION ALL
+SELECT Category, product, total_spend FROM CTE2
+
 
 --baitap 3
   WITH countt AS(
@@ -31,7 +47,23 @@
   WHERE countt >=1
 
 --baitap 5
-
+  WITH 
+  curr_month AS (
+    SELECT *
+    FROM user_actions
+    WHERE event_type IN ('sign-in','like','commnet')
+      AND  EXTRACT(month from event_date) = 7 ),
+      
+  last_month AS (
+    SELECT *
+    FROM user_actions
+    WHERE event_type IN ('sign-in','like','commnet')
+      AND  EXTRACT(month from event_date) = 6 )
+    
+    SELECT EXTRACT(MONTH FROM a.event_date) AS month, COUNT(DISTINCT a.user_id) monthly_active_users
+    FROM curr_month a
+    JOIN last_month b ON a.user_id = b.user_id
+    GROUP BY month
 --baitap 6 
 SELECT  SUBSTR(trans_date,1,7) as month, country, count(id) as trans_count, 
         SUM(CASE WHEN state = 'approved' then 1 else 0 END) as approved_count, 
@@ -78,7 +110,20 @@ FROM a
 WHERE duplicate_companies >1 
 
 --baitap 11
+  WITH 
+  rating_t AS (SELECT name, COUNT(*)
+    FROM users a
+    JOIN MovieRating b ON a.user_id = b.user_id),
 
+ avg_t AS (SELECT title
+    FROM Movies a
+    JOIN MovieRating b ON a.movie_id = b.movie_id AND b.created_at BETWEEN '2020-02-01' AND '2020-02-29'
+    GROUP BY title
+    order by avg(rating) desc, title ASC
+    LIMIT 1)
+    SELECT name results FROM rating_t 
+    UNION ALL
+    SELECT title FROM avg_t
 --baitap 12
   WITH CTE AS (
     SELECT requester_id AS id
