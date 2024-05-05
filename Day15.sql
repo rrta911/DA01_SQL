@@ -67,3 +67,42 @@ EXTRACT(EPOCH FROM transaction_timestamp -
 SELECT COUNT(merchant_id) AS payment_count
 FROM CTE
 WHERE dif <= 10;
+
+--baitap 7 
+/* TOP TWO highest products each category 
+year 2022, 
+OUTput: category, product, *total spend 
+1. Total spend for each category 
+2. MAIN QUERY */
+WITH top_two AS (
+SELECT 
+  category, 
+  product, 
+  SUM(spend) total_spend,
+  RANK() OVER(PARTITION BY category ORDER BY SUM(spend) DESC) as r
+  FROM product_spend
+  WHERE EXTRACT (YEAR FROM transaction_date) = 2022
+  GROUP BY category, product )
+  
+  SELECT 
+  category, 
+  product, 
+  total_spend
+  FROM top_two
+  WHERE r <=2 
+  ORDER BY category, r
+
+--baitap 8 
+  WITH top_10 AS(
+-- lay danh sach top 10 
+SELECT a.artist_name,
+  DENSE_RANK() OVER(ORDER BY COUNT(b.song_id) DESC) as artist_rank --rank artist co nhieu bai hat 
+FROM artists a  
+JOIN songs b ON a.artist_id = b.artist_id
+JOIN global_song_rank c ON b.song_id = c.song_id
+WHERE c.rank <=10
+GROUP BY a.artist_name )
+
+SELECT artist_name, artist_rank
+FROM top_10
+WHERE artist_rank <=5
