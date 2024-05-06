@@ -47,6 +47,23 @@ WHERE A = 3
   ORDER BY transaction_date
 
 --baitap 5
+  /*1. OUTPUT: user_id, tweet_date, rolling_avg_3d: sum_total_3days / 3 days
+SELECT * FROM tweets; */
+WITH CTE AS (SELECT tweet_date, tweet_count, user_id, 
+lag(tweet_count,1) OVER(PARTITION BY user_id ) as lag1,
+LAG(tweet_count,2) OVER(PARTITION BY user_id ) as lag2
+FROM tweets)
+
+SELECT user_id, tweet_date, 
+CASE 
+    WHEN lag1 IS NULL AND lag2 IS NULL THEN ROUND(tweet_count, 2)
+    WHEN lag1 IS NULL THEN ROUND((lag2 + tweet_count) / 2.0, 2)
+    WHEN lag2 IS NULL THEN ROUND((lag1 + tweet_count) / 2.0, 2)
+    ELSE ROUND((lag1 + lag2 + tweet_count) / 3.0, 2)
+  END AS rolling_avg_3d
+FROM CTE
+
+
 
 --baitap 6
 /* output: payment_count: 
