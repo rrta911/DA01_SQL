@@ -3,6 +3,22 @@ select * from sales_dataset_rfm_prj
 	ALTER TABLE sales_dataset_rfm_prj
 	alter COLUMN priceeach  type numeric USING(priceeach::numeric)
 
+	ALTER TABLE sales_dataset_rfm_prj
+	alter COLUMN priceeach  type numeric USING(priceeach::numeric)
+	
+		
+	ALTER TABLE sales_dataset_rfm_prj
+	alter COLUMN orderlinenumber  type decimal USING(priceeach::decimal)
+	
+	ALTER TABLE sales_dataset_rfm_prj
+	alter COLUMN sales  type numeric USING(priceeach::numeric)
+	
+	ALTER TABLE sales_dataset_rfm_prj
+	alter COLUMN msrp  type numeric USING(priceeach::numeric)
+	
+	ALTER TABLE sales_dataset_rfm_prj
+	alter COLUMN postalcode  type numeric USING(priceeach::numeric)
+
 -- câu 2
 	SELECT ORDERNUMBER, QUANTITYORDERED, PRICEEACH, ORDERLINENUMBER, SALES, ORDERDATE
 	FROM sales_dataset_rfm_prj
