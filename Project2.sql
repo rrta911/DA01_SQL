@@ -110,4 +110,73 @@ ORDER BY month
 ) t
 Order by Product_category, Year, Month
 
+2. 
 
+WITH t1 AS(
+  SELECT b.created_at, b.sale_price,b.user_id
+  FROM bigquery-public-data.thelook_ecommerce.users a 
+  JOIN bigquery-public-data.thelook_ecommerce.order_items b ON a.id = b.user_id 
+)
+
+ --- begin analyst 
+--select * from online_retail_main
+,online_retail_index as(
+SELECT 
+  *,
+	FORMAT_DATE('%Y-%m-%d',created_at) as cohort_date,
+	(FORMAT_DATE('%Y', created_at)- FORMAT_DATE('%Y', first_purchase_date))*12
+	+(FORMAT_DATE('%m', created_at)-FORMAT_DATE('%m', first_purchase_date))+1 as indexs
+FROM(
+	SELECT user_id,
+	  sale_price AS amount,
+MIN(created_at) over(PARTITION BY user_id) as first_purchase_date,
+created_at
+from t1
+) a)
+,xxx as(
+SELECT 
+cohort_date,
+index,
+count(distinct user_id) as cnt,
+sum(amount) as revenue
+from online_retail_index
+group by cohort_date, index)
+
+--- customer_cohort
+,customer_cohort as (
+select 
+cohort_date,
+sum(case when index=1 then cnt else 0 end ) as m1,
+sum(case when index=2 then cnt else 0 end ) as m2,
+sum(case when index=3 then cnt else 0 end ) as m3,
+sum(case when index=4 then cnt else 0 end ) as m4,
+sum(case when index=5 then cnt else 0 end ) as m5,
+sum(case when index=6 then cnt else 0 end ) as m6,
+sum(case when index=7 then cnt else 0 end ) as m7,
+sum(case when index=8 then cnt else 0 end ) as m8,
+sum(case when index=9 then cnt else 0 end ) as m9,
+sum(case when index=10 then cnt else 0 end ) as m10,
+sum(case when index=11 then cnt else 0 end ) as m11,
+sum(case when index=12 then cnt else 0 end ) as m12,
+sum(case when index=13 then cnt else 0 end ) as m13
+from xxx
+group by cohort_date
+order by cohort_date)
+-- retention cohort
+select
+cohort_date,
+(100-round(100.00* m1/m1,2))||'%' as m1,
+(100-round(100.00* m2/m1,2))|| '%' as m2,
+(100-round(100.00* m3/m1,2)) || '%' as m3,
+round(100.00* m4/m1,2) || '%' as m4,
+round(100.00* m5/m1,2) || '%' as m5,
+round(100.00* m6/m1,2) || '%' as m6,
+round(100.00* m7/m1,2) || '%' as m7,
+round(100.00* m8/m1,2) || '%' as m8,
+round(100.00* m9/m1,2) || '%' as m9,
+round(100.00* m10/m1,2) || '%' as m10,
+round(100.00* m11/m1,2) || '%' as m11,
+round(100.00* m12/m1,2) || '%' as m12,
+round(100.00* m13/m1,2) || '%' as m13
+from customer_cohort
+-- churn cohort
