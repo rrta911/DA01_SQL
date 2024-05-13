@@ -81,4 +81,22 @@ where a.created_at BETWEEN '2022-01-15' AND '2022-04-15'
 GROUP BY  FORMAT_DATE('%Y-%m-%d',a.created_at ), b.category
 ORDER BY dates DESC
 
+II. 
+ --dựng dashboard 
+ 
+SELECT *, ROUND(((TPV- LAG(TPV,1) OVER(ORDER BY month) )/ LAG(TPV,1) OVER(ORDER BY month))*100.00,2) || "%" as revenue_growth, 
+ROUND(((TPO- LAG(TPO,1) OVER(ORDER BY month) )/ LAG(TPO,1) OVER(ORDER BY month))*100.00,2) || "%" as Order_growth 
+FROM (select 
+FORMAT_DATE('%Y-%m',a.created_at ) as month,
+FORMAT_DATE('%Y',a.created_at ) as Year,
+c.category product_category,
+SUM(b.sale_price) TPV,
+COUNT (a.order_id) TPO
+from bigquery-public-data.thelook_ecommerce.orders a 
+JOIN bigquery-public-data.thelook_ecommerce.order_items b ON a.order_id = b.order_id
+JOIN bigquery-public-data.thelook_ecommerce.products c ON b.product_id = c.id
+GROUP BY month, year ,c.category
+ORDER BY month) t
+ORDER BY month
+
 
