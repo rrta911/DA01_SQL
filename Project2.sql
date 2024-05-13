@@ -84,19 +84,30 @@ ORDER BY dates DESC
 II. 
  --dựng dashboard 
  
-SELECT *, ROUND(((TPV- LAG(TPV,1) OVER(ORDER BY month) )/ LAG(TPV,1) OVER(ORDER BY month))*100.00,2) || "%" as revenue_growth, 
-ROUND(((TPO- LAG(TPO,1) OVER(ORDER BY month) )/ LAG(TPO,1) OVER(ORDER BY month))*100.00,2) || "%" as Order_growth 
-FROM (select 
+
+SELECT *, round(cast((TPV - lag(TPV) OVER(PARTITION BY Product_category ORDER BY Year, Month))
+      /lag(TPV) OVER(PARTITION BY Product_category ORDER BY Year, Month) as Decimal)*100.00,2) || '%'
+       as Revenue_growth,
+round(cast((TPO - lag(TPO) OVER(PARTITION BY Product_category ORDER BY Year, Month))
+      /lag(TPO) OVER(PARTITION BY Product_category ORDER BY Year, Month) as Decimal)*100.00,2) || '%'
+       as Order_growth,
+Total_cost,
+round(TPV - Total_cost,2) as Total_profit,
+round((TPV - Total_cost)/Total_cost,2) as Profit_to_cost_ratio
+FROM (
+  select 
 FORMAT_DATE('%Y-%m',a.created_at ) as month,
 FORMAT_DATE('%Y',a.created_at ) as Year,
-c.category product_category,
-SUM(b.sale_price) TPV,
-COUNT (a.order_id) TPO
+b.category Product_category,
+round(sum(c.sale_price),2) TPV,
+COUNT (c.order_id) TPO,
+round(sum(b.cost),2) as Total_cost
 from bigquery-public-data.thelook_ecommerce.orders a 
-JOIN bigquery-public-data.thelook_ecommerce.order_items b ON a.order_id = b.order_id
-JOIN bigquery-public-data.thelook_ecommerce.products c ON b.product_id = c.id
-GROUP BY month, year ,c.category
-ORDER BY month) t
+JOIN bigquery-public-data.thelook_ecommerce.products b ON a.order_id = b.id 
+JOIN bigquery-public-data.thelook_ecommerce.order_items c ON b.id = c.id
+GROUP BY month, year ,Product_category
 ORDER BY month
+) t
+Order by Product_category, Year, Month
 
 
