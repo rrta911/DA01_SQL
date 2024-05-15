@@ -77,16 +77,18 @@ WHERE r IN (1,2,3)
 /* output: Turn, ID, name, weight, total weight
 S1: order by turn, 
 */
+# Write your MySQL query statement below
+/* output: Turn, ID, name, weight, total weight
+S1: order by turn, */
+
 With CTE AS (
 SELECT turn Turn, person_id ID, person_name Name, weight Weight , 
 SUM(weight) OVER(ORDER BY turn ASC) Total
 FROM Queue)
-SELECT Name as person_name 
-FROM (
-SELECT Turn, ID, Name, Weight, Total ,
-CASE 
-    WHEN Total = Weight THEN Total 
-    WHEN LAG(Total,1) OVER(ORDER BY total ASC) <= 1000 THEN Total ELSE 0 END AS outt
+SELECT Name person_name
 FROM CTE 
-ORDER BY outt DESC )a
-Where Turn = MAX(Turn) -1 
+WHERE Total <=1000
+ORDER BY TURN desc
+LIMIT 1
+
+--baitap 8 
