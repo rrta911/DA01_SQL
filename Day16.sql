@@ -45,3 +45,48 @@ FROM seat
 ORDER BY id
 
 --baitap 4 
+
+
+--baitap 5
+SELECT ROUND(SUM(tiv_2016),2) tiv_2016
+FROM (
+SELECT tiv_2015, tiv_2016,
+COUNT(*) OVER(PARTITION BY tiv_2015) cnt,
+COUNT(*) OVER(PARTITION BY lat,lon) rankk
+FROM Insurance ) a
+WHERE  cnt >1 AND rankk = 1
+
+--baitap 6 
+
+# Write your MySQL query statement below
+/* output: department, employee, salary 
+DEMAND: who ear most in EACH departments , find top three (dense_rank) over(partition by department)
+*/
+WITH CTE as(
+SELECT b.name, a.name Employee, a.salary Salary,
+DENSE_RANK() OVER( PARTITION BY a.departmentID ORDER BY a.salary DESC) r
+FROM employee a
+JOIN Department b ON a.departmentID = b.id
+)
+SELECT name as Department, Employee, Salary
+FROM CTE  
+WHERE r IN (1,2,3)
+    
+--baitap 7
+# Write your MySQL query statement below
+/* output: Turn, ID, name, weight, total weight
+S1: order by turn, 
+*/
+With CTE AS (
+SELECT turn Turn, person_id ID, person_name Name, weight Weight , 
+SUM(weight) OVER(ORDER BY turn ASC) Total
+FROM Queue)
+SELECT Name as person_name 
+FROM (
+SELECT Turn, ID, Name, Weight, Total ,
+CASE 
+    WHEN Total = Weight THEN Total 
+    WHEN LAG(Total,1) OVER(ORDER BY total ASC) <= 1000 THEN Total ELSE 0 END AS outt
+FROM CTE 
+ORDER BY outt DESC )a
+Where Turn = MAX(Turn) -1 
