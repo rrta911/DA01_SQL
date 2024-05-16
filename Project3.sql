@@ -43,3 +43,14 @@ GROUP BY year_id, month_id, ordernumber
 SELECT month_id, revenue, ordernumber
 FROM revenue_month
 WHERE month_id =11 AND revenue IN (SELECT max(revenue) FROM revenue_month  GROUP BY month_id)
+
+--baitap 4 
+  select year_id,productline,ORDER_NUMBER, Rankk from
+(select year_id,
+ 	productline, 
+ 	sum(sales) as REVENUE,count(ordernumber) as ORDER_NUMBER, 
+ 	rank() over(partition by year_id order by sum(sales),count(ordernumber) ) Rankk
+ from public.sales_dataset_rfm_prj_clean
+ WHERE country = 'UK'
+group by year_id, productline) as t
+where Rankk =1
