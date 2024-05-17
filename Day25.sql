@@ -32,7 +32,7 @@ SELECT segment, count(*) from (
 SELECT a.customer_id, b.segment 
 FROM rfm_final  a
 JOIN segment_score b ON a.rfm_score = B.score ) as a
-ORDER BY segment 
+GROUP BY segment 
 ORDER BY count(*)
 
 /*Bước 4: Trực quan phân tích RFM
