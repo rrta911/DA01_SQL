@@ -88,4 +88,22 @@ GROUP BY customername),
 	GROUP BY segment,customername
 	
 
-	
+	==> Nhóm khách hàng tốt nhất nằm trong Potential loyalist và Promising
+"Auto Canal Petit"
+"Collectables For Less Inc."
+"Enaco Distributors"
+"FunGiftIdeas.com"
+"Gift Depot Inc."
+"Gifts4AllAges.com"
+"La Corne D'abondance, Co."
+"Motor Mint Distributors Inc."
+"Petit Auto"
+"Stylish Desk Decors, Co."
+"Diecast Classics Inc."
+"L'ordine Souveniers"
+"Quebec Home Shopping Network"
+"Royale Belge"
+"Souveniers And Things Co."
+"Tokyo Collectables, Ltd"
+"UK Collectables, Ltd."
+"Volvo Model Replicas, Co"
